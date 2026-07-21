@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["vitest/globals"],
+    "noEmit": true,
+    /* Tests import TS source files directly — keep extension imports */
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src", "tests"],
+  "exclude": ["dist", "node_modules", "examples"]
+}

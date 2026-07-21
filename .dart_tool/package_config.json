@@ -1,0 +1,16 @@
+{
+  "configVersion": 2,
+  "packages": [
+    {
+      "name": "wacharlo_game_sdk",
+      "rootUri": "../",
+      "packageUri": "lib/",
+      "languageVersion": "3.11"
+    }
+  ],
+  "generator": "pub",
+  "generatorVersion": "3.11.5",
+  "flutterRoot": "file:///usr/local/share/flutter",
+  "flutterVersion": "3.41.9",
+  "pubCache": "file:///Users/gerardoarizmendi/.pub-cache"
+}

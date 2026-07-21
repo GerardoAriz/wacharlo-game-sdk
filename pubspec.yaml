@@ -1,0 +1,7 @@
+name: wacharlo_game_sdk
+description: "Companion Dart tooling for @wacharlo/game-sdk version verification, validation, and JavaScript bundling."
+version: 0.1.1-alpha
+publish_to: 'none'
+
+environment:
+  sdk: ^3.11.5

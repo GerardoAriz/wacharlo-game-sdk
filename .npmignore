@@ -1,0 +1,19 @@
+# Development / tooling — excluded from npm pack
+node_modules/
+examples/
+.gemini/
+*.tsbuildinfo
+
+# Test & CI artifacts
+coverage/
+.nyc_output/
+
+# Editor metadata
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Build tooling configs (consumers don't need these)
+tsconfig.build.json

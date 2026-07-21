@@ -1,0 +1,14 @@
+{
+  "roots": [
+    "wacharlo_game_sdk"
+  ],
+  "packages": [
+    {
+      "name": "wacharlo_game_sdk",
+      "version": "0.1.1-alpha",
+      "dependencies": [],
+      "devDependencies": []
+    }
+  ],
+  "configVersion": 1
+}

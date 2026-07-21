@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    /* Override noEmit so tsc actually writes to dist/ */
+    "noEmit": false,
+
+    /* Disable allowImportingTsExtensions — not compatible with emit */
+    "allowImportingTsExtensions": false,
+
+    /* Output location */
+    "outDir": "./dist",
+    "rootDir": "./src",
+
+    /* Ensure declaration files are produced for consumers */
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "include": ["src"],
+  "exclude": ["dist", "node_modules", "examples"]
+}

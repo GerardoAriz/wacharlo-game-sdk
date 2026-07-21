@@ -1,0 +1,49 @@
+{
+  "repository": "wacharlo-game-sdk",
+  "articles": [
+    {
+      "file": "README.md",
+      "slug": "sdk",
+      "title": "Wacharlo Game SDK",
+      "category": "developers",
+      "author": "Google DeepMind team",
+      "version": "1.0.0",
+      "lastUpdated": "2026-07-18",
+      "visibility": "public",
+      "keywords": ["sdk", "game", "overview"]
+    },
+    {
+      "file": "SDK_LIFECYCLE.md",
+      "slug": "sdk-lifecycle",
+      "title": "SDK Lifecycle",
+      "category": "developers",
+      "author": "Google DeepMind team",
+      "version": "1.0.0",
+      "lastUpdated": "2026-07-18",
+      "visibility": "public",
+      "keywords": ["lifecycle", "sdk", "state", "initialization"]
+    },
+    {
+      "file": "CHANGELOG.md",
+      "slug": "release-notes",
+      "title": "Release Notes",
+      "category": "developers",
+      "author": "Google DeepMind team",
+      "version": "1.0.0",
+      "lastUpdated": "2026-07-18",
+      "visibility": "public",
+      "keywords": ["changelog", "release", "notes", "versions"]
+    },
+    {
+      "file": "LOCAL_DEVELOPMENT.md",
+      "slug": "sdk-local-development",
+      "title": "SDK Local Development",
+      "category": "developers",
+      "author": "Google DeepMind team",
+      "version": "1.0.0",
+      "lastUpdated": "2026-07-18",
+      "visibility": "public",
+      "keywords": ["local", "development", "contributing", "sdk"]
+    }
+  ]
+}

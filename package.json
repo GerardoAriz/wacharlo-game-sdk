@@ -1,0 +1,49 @@
+{
+  "name": "@wacharlo/game-sdk",
+  "version": "0.1.1-alpha",
+  "description": "Official integration layer between HTML5 games and the Wacharlo Flutter Game Hub.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "CHANGELOG.md",
+    "SDK_LIFECYCLE.md"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "build:clean": "rm -rf dist && tsc -p tsconfig.build.json",
+    "pack:dry": "npm pack --dry-run",
+    "prepublishOnly": "npm run build:clean",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.7",
+    "esbuild": "^0.20.2",
+    "typescript": "^5.4.5",
+    "vitest": "^3.2.4"
+  },
+  "keywords": [
+    "wacharlo",
+    "game-sdk",
+    "html5",
+    "flutter",
+    "webview"
+  ],
+  "author": "Wacharlo Team",
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "access": "restricted"
+  }
+}
