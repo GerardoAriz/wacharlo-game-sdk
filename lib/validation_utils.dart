@@ -36,15 +36,24 @@ class ValidationUtils {
 
   /// Verifies if the esbuild compiler is executable locally or remotely via npx.
   static Future<bool> checkEsbuild(String sdkPath) async {
-    final localEsbuildPath = Platform.isWindows
-        ? '$sdkPath/node_modules/esbuild/esbuild.exe'
-        : '$sdkPath/node_modules/esbuild/bin/esbuild';
+    final candidatePaths = Platform.isWindows
+        ? [
+            '$sdkPath/node_modules/esbuild/esbuild.exe',
+            '$sdkPath/node_modules/.bin/esbuild.cmd',
+          ]
+        : [
+            '$sdkPath/node_modules/.bin/esbuild',
+            '$sdkPath/node_modules/esbuild/bin/esbuild',
+          ];
 
-    final localEsbuildFile = File(localEsbuildPath);
-    if (localEsbuildFile.existsSync()) {
-      return isCommandAvailable(localEsbuildFile.path, args: ['--version']);
-    } else {
-      return isCommandAvailable('npx', args: ['-y', 'esbuild', '--version']);
+    for (final candidate in candidatePaths) {
+      if (File(candidate).existsSync()) {
+        if (await isCommandAvailable(candidate, args: ['--version'])) {
+          return true;
+        }
+      }
     }
+
+    return isCommandAvailable('npx', args: ['-y', 'esbuild', '--version']);
   }
 }

@@ -173,14 +173,27 @@ import { GameSDK } from './src/sdk/GameSDK';
   String esbuildExecutable = 'npx';
   List<String> esbuildArgs = [];
 
-  final String localEsbuildPath = Platform.isWindows
-      ? '$resolvedSdkPath/node_modules/esbuild/esbuild.exe'
-      : '$resolvedSdkPath/node_modules/esbuild/bin/esbuild';
+  final candidateEsbuildPaths = Platform.isWindows
+      ? [
+          '$resolvedSdkPath/node_modules/esbuild/esbuild.exe',
+          '$resolvedSdkPath/node_modules/.bin/esbuild.cmd',
+        ]
+      : [
+          '$resolvedSdkPath/node_modules/.bin/esbuild',
+          '$resolvedSdkPath/node_modules/esbuild/bin/esbuild',
+        ];
 
-  final localEsbuildFile = File(localEsbuildPath);
-  if (localEsbuildFile.existsSync()) {
-    print('Using local esbuild binary: ${localEsbuildFile.path}');
-    esbuildExecutable = localEsbuildFile.path;
+  String? foundLocalPath;
+  for (final path in candidateEsbuildPaths) {
+    if (File(path).existsSync()) {
+      foundLocalPath = path;
+      break;
+    }
+  }
+
+  if (foundLocalPath != null) {
+    print('Using local esbuild binary: $foundLocalPath');
+    esbuildExecutable = foundLocalPath;
     esbuildArgs = [
       'temp-sdk-entry.ts',
       '--bundle',
