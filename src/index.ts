@@ -67,15 +67,26 @@ export type { GameResult } from './sdk/IGameSDK';
 /** Game data fields the SDK can communicate. All are optional in sdk.report(). */
 export type { SDKGameData } from './types/index';
 
-/** All event names the SDK emits or receives. Used in sdk.on() / sdk.off(). */
-export type { SDKEventType } from './types/index';
+/** Constant map of all SDK events organized into logical namespaces. */
+export { SDKEvent } from './types/index';
 
-/** The callback signature for sdk.on() listeners. */
+/** All event names the SDK emits or receives. */
+export type { SDKEventType, SDKEventEnvelope } from './types/index';
+
+/** The callback signature for event listeners. */
 export type { EventCallback } from './events/IEventManager';
+
+// ── SUB-MODULE MANAGERS ───────────────────────────────────────────────────────
+
+export type { IHostManager } from './host/IHostManager';
+export { HostManager } from './host/HostManager';
+
+export type { ISocialManager } from './social/ISocialManager';
+export { SocialManager } from './social/SocialManager';
 
 // ── VERSION ───────────────────────────────────────────────────────────────────
 
-/** The running SDK version string. E.g. "0.1.0-alpha". */
+/** The running SDK version string. E.g. "1.1.0-rc1". */
 export { SDK_VERSION } from './version/index';
 
 // ── ADVANCED / EXTENSION SURFACE ─────────────────────────────────────────────

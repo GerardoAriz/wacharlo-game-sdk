@@ -1,12 +1,16 @@
 import type { IGameSDK, GameResult } from './IGameSDK';
 import type { GameConfig } from '../config/GameConfig';
-import type { SDKGameData, SDKEventType, SDKDiagnostics, SDKMessageType } from '../types/index';
+import type { SDKGameData, SDKEventType, SDKDiagnostics, SDKMessageType, SDKEventEnvelope } from '../types/index';
 import type { EventCallback } from '../events/IEventManager';
 
 import { SessionManager } from '../session/SessionManager';
 import { GameDataManager } from '../state/GameDataManager';
 import { EventManager } from '../events/EventManager';
 import { AchievementManager } from '../achievements/AchievementManager';
+import { HostManager } from '../host/HostManager';
+import { SocialManager } from '../social/SocialManager';
+import type { IHostManager } from '../host/IHostManager';
+import type { ISocialManager } from '../social/ISocialManager';
 import { Logger } from '../logger/Logger';
 import { SDK_VERSION } from '../version/index';
 import { Transport } from '../transport/Transport';
@@ -25,6 +29,8 @@ export class GameSDK implements IGameSDK {
   private readonly _data: GameDataManager;
   private readonly _events: EventManager;
   private readonly _achievements: AchievementManager;
+  private readonly _hostManager: HostManager;
+  private readonly _socialManager: SocialManager;
   private readonly _logger: Logger;
   private readonly _transport: Transport;
 
@@ -58,6 +64,14 @@ export class GameSDK implements IGameSDK {
     return this._config;
   }
 
+  public get host(): IHostManager {
+    return this._hostManager;
+  }
+
+  public get social(): ISocialManager {
+    return this._socialManager;
+  }
+
   // ── Constructor (Private — use GameSDK.create()) ───────────────────────────
 
   private constructor(config: GameConfig, overrides?: { transport?: Transport; sessionId?: string }) {
@@ -68,6 +82,13 @@ export class GameSDK implements IGameSDK {
     this._events  = new EventManager();
     this._achievements = new AchievementManager(this._events);
     this._transport = overrides?.transport ?? detectTransport();
+
+    this._hostManager = new HostManager(
+      this._events,
+      (envelope: SDKEventEnvelope) => this.sendHostEnvelope(envelope),
+      () => this._session.getId() ?? undefined,
+    );
+    this._socialManager = new SocialManager(this._hostManager);
 
     if (overrides?.sessionId && overrides.sessionId.trim() !== '') {
       this._hostSessionId = overrides.sessionId.trim();
@@ -395,7 +416,20 @@ export class GameSDK implements IGameSDK {
 
   // ── Private Envelope Builder ───────────────────────────────────────────────
 
-  private createMessageEnvelope(event: SDKEventType, payload?: Record<string, unknown>): SDKMessageType {
+  private sendHostEnvelope(envelope: SDKEventEnvelope): void {
+    const msg = this.createMessageEnvelope(
+      envelope.event,
+      envelope.payload as Record<string, unknown> | undefined,
+      envelope.roomId,
+    );
+    this._transport.send(msg);
+  }
+
+  private createMessageEnvelope(
+    event: SDKEventType,
+    payload?: Record<string, unknown>,
+    roomId?: string,
+  ): SDKMessageType {
     const meta = this._session.getMeta();
     const sessionId = meta?.sessionId ?? '';
     const device = meta?.device ?? {
@@ -415,6 +449,7 @@ export class GameSDK implements IGameSDK {
       sessionId,
       device,
       data: this._data.getLastSnapshot() ?? {},
+      ...(roomId ? { roomId } : {}),
       payload,
     };
   }

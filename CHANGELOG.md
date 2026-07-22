@@ -10,6 +10,22 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 > Changes that are planned or in progress but not yet released.
 
+## [1.1.0-rc1] - 2026-07-22
+
+### Added
+- **Host Communication API (`sdk.host`)**:
+  - Unified generic event dispatcher for game-to-host events via `sdk.host.emit(event, payload, roomId)`.
+  - Event listener subscription interface via `sdk.host.on(event, callback)` and `sdk.host.off(event, callback)`.
+  - Architecture ready for future `sdk.host.capabilities` API.
+- **Social Invitation Platform Actions API (`sdk.social`)**:
+  - User-facing social actions `sdk.social.inviteFriend(roomId, payload?)` and `sdk.social.shareRoom(roomId, payload?)`.
+- **Standardized Single Envelope (`SDKEventEnvelope`)**:
+  - Standardized host communication envelope containing `event`, `timestamp`, `sessionId`, `roomId`, and `payload`.
+- **Categorized `SDKEvent` Constants**:
+  - Logical namespaces: `ROOM_*` (`ROOM_CREATED`, `ROOM_JOINED`, `ROOM_LEFT`, `ROOM_CLOSED`), `MATCH_*` (`MATCH_PREPARING`, `COUNTDOWN_STARTED`, `MATCH_STARTED`, `MATCH_FINISHED`, `REMATCH_REQUESTED`, `REMATCH_ACCEPTED`), `PLAYER_*` (`PLAYER_JOINED`, `PLAYER_LEFT`, `PLAYER_READY`, `SCORE_UPDATED`, `PLAYER_DIED`), and `SOCIAL_*` (`INVITE_FRIEND`, `SHARE_ROOM`).
+- **Dart JS Interop Wrapper (`wacharlo_game_sdk`)**:
+  - Lightweight Dart interop wrapper using `dart:js_interop` exposing `@wacharlo/game-sdk` (single source of truth).
+
 ### Planned for Phase 3 (Rope Rush Migration)
 - Implement `sdk.initialize()` — bridge detection, version check, INITIALIZE message
 - Implement `sdk.isInitialized()` — return internal `_initialized` flag

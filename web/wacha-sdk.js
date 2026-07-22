@@ -1,4 +1,4 @@
-/* @wacharlo/game-sdk v0.1.1-alpha - Built on 2026-07-21T17:21:52.089525Z */
+/* @wacharlo/game-sdk v1.1.0-rc1 - Built on 2026-07-22T23:32:43.024139Z */
 "use strict";
 (() => {
   // src/logger/Logger.ts
@@ -313,8 +313,129 @@
     }
   };
 
+  // src/host/HostManager.ts
+  var HostManager = class {
+    constructor(eventManager, envelopeSender, getSessionId) {
+      this.eventManager = eventManager;
+      this.envelopeSender = envelopeSender;
+      this.getSessionId = getSessionId;
+    }
+    eventManager;
+    envelopeSender;
+    getSessionId;
+    logger = new Logger("HostManager");
+    emit(event, payload, roomId) {
+      const timestamp = Date.now();
+      const sessionId = this.getSessionId();
+      const envelope = {
+        event,
+        timestamp,
+        ...sessionId ? { sessionId } : {},
+        ...roomId ? { roomId } : {},
+        ...payload !== void 0 ? { payload } : {}
+      };
+      this.logger.debug(`sdk.host.emit [${event}]`, envelope);
+      try {
+        this.envelopeSender(envelope);
+      } catch (e) {
+        this.logger.error(`Failed to send event envelope for ${event}:`, e);
+      }
+      this.eventManager.emit(event, payload);
+    }
+    on(event, callback) {
+      return this.eventManager.on(event, callback);
+    }
+    off(event, callback) {
+      this.eventManager.off(event, callback);
+    }
+    clear() {
+      this.eventManager.clear();
+    }
+  };
+
+  // src/types/index.ts
+  var SDKEvent = {
+    // ── Core & Lifecycle ───────────────────────────────────────────────────────
+    INITIALIZE: "INITIALIZE",
+    GAME_STARTED: "GAME_STARTED",
+    GAME_PAUSED: "GAME_PAUSED",
+    GAME_RESUMED: "GAME_RESUMED",
+    GAME_OVER: "GAME_OVER",
+    DATA_UPDATED: "DATA_UPDATED",
+    ACHIEVEMENT_UNLOCKED: "ACHIEVEMENT_UNLOCKED",
+    SHOW_LEADERBOARD: "SHOW_LEADERBOARD",
+    REQUEST_LEADERBOARD: "REQUEST_LEADERBOARD",
+    REQUEST_EXIT: "REQUEST_EXIT",
+    REQUEST_PAUSE: "REQUEST_PAUSE",
+    REQUEST_RESUME: "REQUEST_RESUME",
+    START_GAME: "START_GAME",
+    RESTART_GAME: "RESTART_GAME",
+    LOAD_MINIGAME: "LOAD_MINIGAME",
+    ADOPT_SESSION: "ADOPT_SESSION",
+    // ── ROOM_* (Room Lifecycle Events) ─────────────────────────────────────────
+    ROOM_CREATED: "ROOM_CREATED",
+    ROOM_JOINED: "ROOM_JOINED",
+    ROOM_LEFT: "ROOM_LEFT",
+    ROOM_CLOSED: "ROOM_CLOSED",
+    // ── MATCH_* (Match Lifecycle Events) ────────────────────────────────────────
+    MATCH_PREPARING: "MATCH_PREPARING",
+    COUNTDOWN_STARTED: "COUNTDOWN_STARTED",
+    MATCH_STARTED: "MATCH_STARTED",
+    MATCH_FINISHED: "MATCH_FINISHED",
+    REMATCH_REQUESTED: "REMATCH_REQUESTED",
+    REMATCH_ACCEPTED: "REMATCH_ACCEPTED",
+    // ── PLAYER_* (Player Lifecycle & State Events) ──────────────────────────────
+    PLAYER_JOINED: "PLAYER_JOINED",
+    PLAYER_LEFT: "PLAYER_LEFT",
+    PLAYER_READY: "PLAYER_READY",
+    SCORE_UPDATED: "SCORE_UPDATED",
+    PLAYER_DIED: "PLAYER_DIED",
+    // ── SOCIAL_* (User-Facing Platform Actions) ────────────────────────────────
+    INVITE_FRIEND: "INVITE_FRIEND",
+    SHARE_ROOM: "SHARE_ROOM"
+  };
+
+  // src/social/SocialManager.ts
+  var SocialManager = class {
+    constructor(host) {
+      this.host = host;
+    }
+    host;
+    logger = new Logger("SocialManager");
+    async inviteFriend(roomId, payload) {
+      if (!roomId || typeof roomId !== "string" || roomId.trim() === "") {
+        this.logger.warn("inviteFriend() called with empty or invalid roomId.");
+        throw new Error("SocialManager.inviteFriend: roomId must be a non-empty string.");
+      }
+      this.logger.info(`sdk.social.inviteFriend for roomId: ${roomId}`);
+      this.host.emit(
+        SDKEvent.INVITE_FRIEND,
+        {
+          roomId: roomId.trim(),
+          ...payload
+        },
+        roomId.trim()
+      );
+    }
+    async shareRoom(roomId, payload) {
+      if (!roomId || typeof roomId !== "string" || roomId.trim() === "") {
+        this.logger.warn("shareRoom() called with empty or invalid roomId.");
+        throw new Error("SocialManager.shareRoom: roomId must be a non-empty string.");
+      }
+      this.logger.info(`sdk.social.shareRoom for roomId: ${roomId}`);
+      this.host.emit(
+        SDKEvent.SHARE_ROOM,
+        {
+          roomId: roomId.trim(),
+          ...payload
+        },
+        roomId.trim()
+      );
+    }
+  };
+
   // src/version/index.ts
-  var SDK_VERSION = "0.1.1-alpha";
+  var SDK_VERSION = "1.1.0-rc1";
 
   // src/transport/Transport.ts
   var Transport = class {
@@ -576,6 +697,8 @@
     _data;
     _events;
     _achievements;
+    _hostManager;
+    _socialManager;
     _logger;
     _transport;
     _initialized = false;
@@ -602,6 +725,12 @@
     get config() {
       return this._config;
     }
+    get host() {
+      return this._hostManager;
+    }
+    get social() {
+      return this._socialManager;
+    }
     // ── Constructor (Private — use GameSDK.create()) ───────────────────────────
     constructor(config, overrides) {
       this._config = Object.freeze({ ...config });
@@ -611,6 +740,12 @@
       this._events = new EventManager();
       this._achievements = new AchievementManager(this._events);
       this._transport = overrides?.transport ?? detectTransport();
+      this._hostManager = new HostManager(
+        this._events,
+        (envelope) => this.sendHostEnvelope(envelope),
+        () => this._session.getId() ?? void 0
+      );
+      this._socialManager = new SocialManager(this._hostManager);
       if (overrides?.sessionId && overrides.sessionId.trim() !== "") {
         this._hostSessionId = overrides.sessionId.trim();
         this._hostSessionOrigin = "manual";
@@ -820,6 +955,14 @@
         this._transport.send(msg);
       }
     }
+    showLeaderboard(payload) {
+      if (!this._initialized) {
+        this._logger.warn("showLeaderboard() called before initialize(). Call sdk.initialize() first.");
+        return;
+      }
+      const msg = this.createMessageEnvelope("SHOW_LEADERBOARD", payload ?? {});
+      this._transport.send(msg);
+    }
     on(event, callback) {
       return this._events.on(event, callback);
     }
@@ -855,7 +998,15 @@
       };
     }
     // ── Private Envelope Builder ───────────────────────────────────────────────
-    createMessageEnvelope(event, payload) {
+    sendHostEnvelope(envelope) {
+      const msg = this.createMessageEnvelope(
+        envelope.event,
+        envelope.payload,
+        envelope.roomId
+      );
+      this._transport.send(msg);
+    }
+    createMessageEnvelope(event, payload, roomId) {
       const meta = this._session.getMeta();
       const sessionId = meta?.sessionId ?? "";
       const device = meta?.device ?? {
@@ -874,6 +1025,7 @@
         sessionId,
         device,
         data: this._data.getLastSnapshot() ?? {},
+        ...roomId ? { roomId } : {},
         payload
       };
     }

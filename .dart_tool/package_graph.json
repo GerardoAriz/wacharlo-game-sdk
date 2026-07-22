@@ -5,7 +5,7 @@
   "packages": [
     {
       "name": "wacharlo_game_sdk",
-      "version": "0.1.1-alpha",
+      "version": "1.1.0-rc1",
       "dependencies": [],
       "devDependencies": []
     }

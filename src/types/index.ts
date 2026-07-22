@@ -10,46 +10,71 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * All event types the SDK can emit to or receive from the host platform.
- *
- * Outgoing (game → host):
- *   INITIALIZE, GAME_STARTED, GAME_PAUSED, GAME_RESUMED,
- *   DATA_UPDATED, GAME_OVER, ACHIEVEMENT_UNLOCKED,
- *   REQUEST_LEADERBOARD, REQUEST_EXIT, REQUEST_PAUSE, REQUEST_RESUME
- *
- * Incoming (host → game):
- *   START_GAME, RESTART_GAME, LOAD_MINIGAME, REQUEST_PAUSE, REQUEST_RESUME
- *
- * TODO: Expand this union as new game features are added.
+ * Organized SDKEvent constant map.
  */
-export type SDKEventType =
-  // ── Lifecycle ──────────────────────────────────────────────────────────────
-  | 'INITIALIZE'
-  | 'GAME_STARTED'
-  | 'GAME_PAUSED'
-  | 'GAME_RESUMED'
-  | 'GAME_OVER'
-  // ── Data ──────────────────────────────────────────────────────────────────
-  | 'DATA_UPDATED'
-  // ── Achievements ──────────────────────────────────────────────────────────
-  | 'ACHIEVEMENT_UNLOCKED'
-  // ── Host Requests (game → host) ───────────────────────────────────────────
-  | 'SHOW_LEADERBOARD'
-  | 'REQUEST_LEADERBOARD'
-  | 'REQUEST_EXIT'
-  | 'REQUEST_PAUSE'
-  | 'REQUEST_RESUME'
-  // ── Host Commands (host → game) ───────────────────────────────────────────
-  | 'START_GAME'
-  | 'RESTART_GAME'
-  | 'LOAD_MINIGAME'
-  | 'ADOPT_SESSION';
+export const SDKEvent = {
+  // ── Core & Lifecycle ───────────────────────────────────────────────────────
+  INITIALIZE: 'INITIALIZE',
+  GAME_STARTED: 'GAME_STARTED',
+  GAME_PAUSED: 'GAME_PAUSED',
+  GAME_RESUMED: 'GAME_RESUMED',
+  GAME_OVER: 'GAME_OVER',
+  DATA_UPDATED: 'DATA_UPDATED',
+  ACHIEVEMENT_UNLOCKED: 'ACHIEVEMENT_UNLOCKED',
+  SHOW_LEADERBOARD: 'SHOW_LEADERBOARD',
+  REQUEST_LEADERBOARD: 'REQUEST_LEADERBOARD',
+  REQUEST_EXIT: 'REQUEST_EXIT',
+  REQUEST_PAUSE: 'REQUEST_PAUSE',
+  REQUEST_RESUME: 'REQUEST_RESUME',
+  START_GAME: 'START_GAME',
+  RESTART_GAME: 'RESTART_GAME',
+  LOAD_MINIGAME: 'LOAD_MINIGAME',
+  ADOPT_SESSION: 'ADOPT_SESSION',
+
+  // ── ROOM_* (Room Lifecycle Events) ─────────────────────────────────────────
+  ROOM_CREATED: 'ROOM_CREATED',
+  ROOM_JOINED: 'ROOM_JOINED',
+  ROOM_LEFT: 'ROOM_LEFT',
+  ROOM_CLOSED: 'ROOM_CLOSED',
+
+  // ── MATCH_* (Match Lifecycle Events) ────────────────────────────────────────
+  MATCH_PREPARING: 'MATCH_PREPARING',
+  COUNTDOWN_STARTED: 'COUNTDOWN_STARTED',
+  MATCH_STARTED: 'MATCH_STARTED',
+  MATCH_FINISHED: 'MATCH_FINISHED',
+  REMATCH_REQUESTED: 'REMATCH_REQUESTED',
+  REMATCH_ACCEPTED: 'REMATCH_ACCEPTED',
+
+  // ── PLAYER_* (Player Lifecycle & State Events) ──────────────────────────────
+  PLAYER_JOINED: 'PLAYER_JOINED',
+  PLAYER_LEFT: 'PLAYER_LEFT',
+  PLAYER_READY: 'PLAYER_READY',
+  SCORE_UPDATED: 'SCORE_UPDATED',
+  PLAYER_DIED: 'PLAYER_DIED',
+
+  // ── SOCIAL_* (User-Facing Platform Actions) ────────────────────────────────
+  INVITE_FRIEND: 'INVITE_FRIEND',
+  SHARE_ROOM: 'SHARE_ROOM',
+} as const;
+
+/**
+ * All event types the SDK can emit to or receive from the host platform.
+ */
+export type SDKEventType = typeof SDKEvent[keyof typeof SDKEvent];
+
+/**
+ * Standardized single message envelope for all Host communication.
+ */
+export interface SDKEventEnvelope<T = unknown> {
+  event: SDKEventType;
+  timestamp: number;
+  sessionId?: string;
+  roomId?: string;
+  payload?: T;
+}
 
 /**
  * Generic event payload. Each event type may carry different data.
- *
- * TODO: Replace `any` with a discriminated union of typed payloads
- *       as each event's shape becomes stable.
  */
 export type SDKEventPayload = Record<string, unknown>;
 
@@ -74,6 +99,9 @@ export interface SDKMessageType {
 
   /** Game data snapshot at the moment of the event */
   data: Partial<SDKGameData>;
+
+  /** Room ID if event pertains to a specific room */
+  roomId?: string;
 
   /** Arbitrary extra fields for custom events */
   payload?: SDKEventPayload;

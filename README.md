@@ -167,15 +167,15 @@ wacharlo-game-sdk/
 Creates a new SDK instance. Does NOT connect to the host.
 
 ```typescript
-import { GameSDK } from '@wacharlo/game-sdk';
+import { GameSDK, SDKEvent } from '@wacharlo/game-sdk';
 import type { GameConfig } from '@wacharlo/game-sdk';
 
 const sdk = GameSDK.create({
   gameSlug: 'rope-rush',          // kebab-case, unique per game
-  gameVersion: '3.0.0',           // semver string
-  minSDKVersion: '0.1.0',         // minimum compatible SDK version
+  gameVersion: '1.1.0',           // semver string
+  minSDKVersion: '1.1.0',         // minimum compatible SDK version
   supportsLeaderboard: true,
-  supportsAchievements: false,
+  supportsAchievements: true,
   supportsCloudSave: false,
   supportsXP: false,
   displayName: 'Rope Rush',       // optional, shown in logs

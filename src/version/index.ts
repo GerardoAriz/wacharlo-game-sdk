@@ -11,4 +11,4 @@
  *   import { SDK_VERSION } from '@wacharlo/game-sdk';
  *   console.log(SDK_VERSION); // "0.1.0-alpha"
  */
-export const SDK_VERSION = '0.1.1-alpha';
+export const SDK_VERSION = '1.1.0-rc1';

@@ -175,6 +175,32 @@ export interface IGameSDK {
    */
   readonly config: Readonly<import('../config/GameConfig').GameConfig>;
 
+  // ── Sub-Modules ─────────────────────────────────────────────────────────────
+
+  /**
+   * Host Platform Communication API (`sdk.host`).
+   *
+   * Dedicated interface for all communication between the Game and the Host platform.
+   * Use `sdk.host.emit(event, payload)` to send events/data to the host, and
+   * `sdk.host.on(event, callback)` to listen to host commands.
+   *
+   * @example
+   *   sdk.host.emit(SDKEvent.MATCH_STARTED, { mapId: 'arena_1' });
+   *   sdk.host.on(SDKEvent.REQUEST_PAUSE, () => game.pause());
+   */
+  readonly host: import('../host/IHostManager').IHostManager;
+
+  /**
+   * Platform Social Actions API (`sdk.social`).
+   *
+   * Strictly dedicated to user-facing platform social actions.
+   *
+   * @example
+   *   await sdk.social.inviteFriend(roomId);
+   *   await sdk.social.shareRoom(roomId);
+   */
+  readonly social: import('../social/ISocialManager').ISocialManager;
+
   // ── Status ─────────────────────────────────────────────────────────────────
 
   /**
