@@ -31,10 +31,15 @@ export const SDKEvent = {
   LOAD_MINIGAME: 'LOAD_MINIGAME',
   ADOPT_SESSION: 'ADOPT_SESSION',
 
+  // ── TELEMETRY & PIPELINE ───────────────────────────────────────────────────
+  JOIN_PIPELINE_STARTED: 'JOIN_PIPELINE_STARTED',
+  JOIN_PIPELINE_FINISHED: 'JOIN_PIPELINE_FINISHED',
+
   // ── ROOM_* (Room Lifecycle Events & Commands) ──────────────────────────────
   ROOM_CREATED: 'ROOM_CREATED',
   ROOM_JOINED: 'ROOM_JOINED',
   ROOM_LEFT: 'ROOM_LEFT',
+  DESTROYING_ROOM: 'DESTROYING_ROOM',
   ROOM_CLOSED: 'ROOM_CLOSED',
   JOIN_ROOM: 'JOIN_ROOM',
 
@@ -50,8 +55,14 @@ export const SDKEvent = {
   PLAYER_JOINED: 'PLAYER_JOINED',
   PLAYER_LEFT: 'PLAYER_LEFT',
   PLAYER_READY: 'PLAYER_READY',
+  PLAYER_RECONNECTING: 'PLAYER_RECONNECTING',
+  PLAYER_RECONNECTED: 'PLAYER_RECONNECTED',
   SCORE_UPDATED: 'SCORE_UPDATED',
   PLAYER_DIED: 'PLAYER_DIED',
+
+  // ── HANDSHAKE ─────────────────────────────────────────────────────────────
+  HANDSHAKE_INIT: 'HANDSHAKE_INIT',
+  HANDSHAKE_ACK: 'HANDSHAKE_ACK',
 
   // ── SOCIAL_* (User-Facing Platform Actions) ────────────────────────────────
   INVITE_FRIEND: 'INVITE_FRIEND',
@@ -199,5 +210,124 @@ export interface SDKDiagnostics {
   /** The name of the active transport class. Same as activeTransport for convenience. */
   transport: string;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Storage & Pipeline Architecture Types (v1.2)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Storage abstraction interface for session recovery token persistence.
+ * Platforms provide their own implementation (localStorage/IndexedDB in Web,
+ * Secure Storage in Android, Keychain in iOS).
+ */
+export interface ISessionStorageAdapter {
+  getItem(key: string): Promise<string | null>;
+  setItem(key: string, value: string): Promise<void>;
+  removeItem(key: string): Promise<void>;
+  clear(): Promise<void>;
+}
+
+/**
+ * Standardized invite payload with canonical inviteId and schema versioning.
+ */
+export interface InvitePayload {
+  inviteSchemaVersion: '1.0';
+  sdkVersion: string;
+  inviteId: string;
+  gameId: string;
+  inviter: {
+    userId: string;
+    displayName: string;
+    avatarUrl?: string;
+  };
+  customData?: Record<string, unknown>;
+  createdAt: number;
+  expiresAt: number;
+  signature: string;
+}
+
+/**
+ * Entry trigger channels that Wacharlo App forwards raw to the SDK.
+ */
+export type JoinTriggerType =
+  | 'deep_link'
+  | 'push_notification'
+  | 'friend_invite'
+  | 'room_code'
+  | 'qr_code'
+  | 'session_recovery'
+  | 'matchmaking';
+
+/**
+ * Raw trigger envelope delivered by Wacharlo App to GameSDK.
+ */
+export interface RawAppTriggerEvent {
+  trigger: JoinTriggerType;
+  payload: Record<string, unknown>;
+  userAuthToken: string;
+  userProfile: {
+    userId: string;
+    displayName: string;
+    avatarUrl?: string;
+  };
+  timestamp: number;
+}
+
+/**
+ * Normalized join request constructed and owned exclusively by GameSDK JoinPipelineManager.
+ */
+export interface JoinRequest {
+  requestId: string;
+  trigger: JoinTriggerType;
+  inviteId: string;
+  gameId: string;
+  player: {
+    userId: string;
+    displayName: string;
+    avatarUrl?: string;
+    authToken: string;
+  };
+  recoveryToken?: string;
+  clientInfo: {
+    sdkVersion: string;
+    gameVersion: string;
+    protocolVersion: number;
+  };
+  timestamp: number;
+}
+
+/**
+ * Strict room lifecycle states including DESTROYING teardown state.
+ */
+export type RoomState =
+  | 'IDLE'
+  | 'CREATING'
+  | 'WAITING_FOR_PLAYERS'
+  | 'PREPARING_MATCH'
+  | 'IN_GAME'
+  | 'PAUSED'
+  | 'DESTROYING'
+  | 'CLOSED';
+
+/**
+ * Handshake negotiation payload sent by guest upon room connection.
+ */
+export interface HandshakeInitPayload {
+  sdkVersion: string;
+  gameId: string;
+  gameVersion: string;
+  protocolVersion: number;
+}
+
+/**
+ * Handshake response payload returned by room host/server.
+ */
+export interface HandshakeAckPayload {
+  status: 'ACCEPTED' | 'REJECTED';
+  minRequiredSdkVersion?: string;
+  errorCode?: string;
+  reason?: string;
+}
+
 
 

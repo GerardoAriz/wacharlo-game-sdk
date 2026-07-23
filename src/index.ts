@@ -114,4 +114,23 @@ export type {
   SDKDeviceInfo,
   SDKSessionMeta,
   SDKDiagnostics,
+  ISessionStorageAdapter,
+  InvitePayload,
+  JoinTriggerType,
+  RawAppTriggerEvent,
+  JoinRequest,
+  RoomState,
+  HandshakeInitPayload,
+  HandshakeAckPayload,
 } from './types/index';
+
+// ── V1.2 ARCHITECTURE SERVICES & ADAPTERS ────────────────────────────────────
+
+export { MemoryStorageAdapter, LocalStorageAdapter } from './session/StorageAdapter.js';
+export { InvitationService, InMemoryLookupService } from './social/InvitationService.js';
+export type { ILookupService } from './social/InvitationService.js';
+export { JoinPipelineManager } from './session/JoinPipelineManager.js';
+export type { JoinPipelineResult } from './session/JoinPipelineManager.js';
+export { SessionRecoveryManager } from './session/SessionRecoveryManager.js';
+export type { RecoverySessionData } from './session/SessionRecoveryManager.js';
+

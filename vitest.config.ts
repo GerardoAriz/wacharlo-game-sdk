@@ -16,7 +16,7 @@ export default defineConfig({
     /**
      * Human-readable output — shows individual test names on pass/fail.
      */
-    reporter: 'verbose',
+    reporters: ['verbose'],
 
     /**
      * Coverage configuration (opt-in via: vitest run --coverage)
