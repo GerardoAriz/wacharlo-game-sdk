@@ -6,7 +6,8 @@ import { BrowserTransport } from '../src/transport/BrowserTransport';
 import { StandaloneTransport } from '../src/transport/StandaloneTransport';
 import { MockTransport } from '../src/transport/MockTransport';
 import { Logger } from '../src/logger/Logger';
-import type { GameConfig, SDKMessageType } from '../src/types/index';
+import type { GameConfig } from '../src/config/GameConfig';
+import type { SDKMessageType } from '../src/types/index';
 
 const BASE_CONFIG: GameConfig = {
   gameSlug: 'test-game',

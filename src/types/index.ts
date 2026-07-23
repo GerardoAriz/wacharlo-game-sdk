@@ -31,11 +31,12 @@ export const SDKEvent = {
   LOAD_MINIGAME: 'LOAD_MINIGAME',
   ADOPT_SESSION: 'ADOPT_SESSION',
 
-  // ── ROOM_* (Room Lifecycle Events) ─────────────────────────────────────────
+  // ── ROOM_* (Room Lifecycle Events & Commands) ──────────────────────────────
   ROOM_CREATED: 'ROOM_CREATED',
   ROOM_JOINED: 'ROOM_JOINED',
   ROOM_LEFT: 'ROOM_LEFT',
   ROOM_CLOSED: 'ROOM_CLOSED',
+  JOIN_ROOM: 'JOIN_ROOM',
 
   // ── MATCH_* (Match Lifecycle Events) ────────────────────────────────────────
   MATCH_PREPARING: 'MATCH_PREPARING',

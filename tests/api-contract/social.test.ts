@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GameSDK, SDKEvent } from '../../src/index';
-import type { GameConfig, SDKMessageType } from '../../src/types/index';
+import type { GameConfig } from '../../src/config/GameConfig';
+import type { SDKMessageType } from '../../src/types/index';
 import { MockTransport } from '../../src/transport/MockTransport';
 
 const BASE_CONFIG: GameConfig = {
@@ -9,6 +10,8 @@ const BASE_CONFIG: GameConfig = {
   minSDKVersion: '1.0.0',
   supportsLeaderboard: true,
   supportsAchievements: true,
+  supportsCloudSave: false,
+  supportsXP: false,
 };
 
 describe('SDK v1.1 Social Platform & Host API', () => {
@@ -27,6 +30,7 @@ describe('SDK v1.1 Social Platform & Host API', () => {
       expect(SDKEvent.ROOM_JOINED).toBe('ROOM_JOINED');
       expect(SDKEvent.ROOM_LEFT).toBe('ROOM_LEFT');
       expect(SDKEvent.ROOM_CLOSED).toBe('ROOM_CLOSED');
+      expect(SDKEvent.JOIN_ROOM).toBe('JOIN_ROOM');
     });
 
     it('defines MATCH_* events', () => {
@@ -97,6 +101,27 @@ describe('SDK v1.1 Social Platform & Host API', () => {
       sdk.host.off(SDKEvent.MATCH_FINISHED, listener2);
       sdk.host.emit(SDKEvent.MATCH_FINISHED, { winner: 'p3' });
       expect(listener2).toHaveBeenCalledTimes(2);
+    });
+
+    it('forwards incoming JOIN_ROOM command from transport to sdk.on listeners', () => {
+      const joinRoomListener = vi.fn();
+      sdk.on(SDKEvent.JOIN_ROOM, joinRoomListener);
+
+      transport.mockReceive({
+        event: SDKEvent.JOIN_ROOM,
+        type: SDKEvent.JOIN_ROOM,
+        gameId: 'test-game',
+        gameVersion: '1.0.0',
+        sdkVersion: '1.1.0',
+        timestamp: Date.now(),
+        sessionId: 'session_123',
+        device: { type: 'desktop', os: 'mac', language: 'en', pixelRatio: 1 },
+        data: {},
+        payload: { roomId: 'room_abc', roomCode: 'ROOM123' },
+      });
+
+      expect(joinRoomListener).toHaveBeenCalledTimes(1);
+      expect(joinRoomListener).toHaveBeenCalledWith({ roomId: 'room_abc', roomCode: 'ROOM123' });
     });
   });
 
