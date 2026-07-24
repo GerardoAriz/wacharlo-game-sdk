@@ -17,6 +17,12 @@ export interface JoinPipelineResult {
   errorMessage?: string;
 }
 
+/**
+ * @deprecated
+ * Room ownership belongs to the game implementation.
+ * The SDK does not own, generate, or manage Room IDs, handshakes, or joining pipelines.
+ * This class is retained for backwards compatibility only.
+ */
 export class JoinPipelineManager {
   private readonly logger = new Logger('JoinPipelineManager');
 

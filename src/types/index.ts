@@ -11,6 +11,9 @@
 
 /**
  * Organized SDKEvent constant map.
+ *
+ * The SDK is completely game-agnostic and acts exclusively as a generic communication bridge.
+ * Room ownership belongs to the game implementation. The SDK does not own, generate, or manage Room IDs.
  */
 export const SDKEvent = {
   // ── Core & Lifecycle ───────────────────────────────────────────────────────
@@ -31,42 +34,63 @@ export const SDKEvent = {
   LOAD_MINIGAME: 'LOAD_MINIGAME',
   ADOPT_SESSION: 'ADOPT_SESSION',
 
-  // ── TELEMETRY & PIPELINE ───────────────────────────────────────────────────
-  JOIN_PIPELINE_STARTED: 'JOIN_PIPELINE_STARTED',
-  JOIN_PIPELINE_FINISHED: 'JOIN_PIPELINE_FINISHED',
-
-  // ── ROOM_* (Room Lifecycle Events & Commands) ──────────────────────────────
+  // ── STANDARDIZED MULTIPLAYER LIFECYCLE (Generic Contract) ───────────────────
+  /** Emitted when a multiplayer room is created. Payload contains roomId & host player info. */
   ROOM_CREATED: 'ROOM_CREATED',
+  /** Emitted when a player joins an existing room. */
   ROOM_JOINED: 'ROOM_JOINED',
-  ROOM_LEFT: 'ROOM_LEFT',
-  DESTROYING_ROOM: 'DESTROYING_ROOM',
-  ROOM_CLOSED: 'ROOM_CLOSED',
-  JOIN_ROOM: 'JOIN_ROOM',
-
-  // ── MATCH_* (Match Lifecycle Events) ────────────────────────────────────────
-  MATCH_PREPARING: 'MATCH_PREPARING',
-  COUNTDOWN_STARTED: 'COUNTDOWN_STARTED',
-  MATCH_STARTED: 'MATCH_STARTED',
-  MATCH_FINISHED: 'MATCH_FINISHED',
-  REMATCH_REQUESTED: 'REMATCH_REQUESTED',
-  REMATCH_ACCEPTED: 'REMATCH_ACCEPTED',
-
-  // ── PLAYER_* (Player Lifecycle & State Events) ──────────────────────────────
+  /** Emitted when another player enters the room. */
   PLAYER_JOINED: 'PLAYER_JOINED',
+  /** Emitted when a player leaves the room. */
   PLAYER_LEFT: 'PLAYER_LEFT',
-  PLAYER_READY: 'PLAYER_READY',
-  PLAYER_RECONNECTING: 'PLAYER_RECONNECTING',
-  PLAYER_RECONNECTED: 'PLAYER_RECONNECTED',
-  SCORE_UPDATED: 'SCORE_UPDATED',
-  PLAYER_DIED: 'PLAYER_DIED',
-
-  // ── HANDSHAKE ─────────────────────────────────────────────────────────────
-  HANDSHAKE_INIT: 'HANDSHAKE_INIT',
-  HANDSHAKE_ACK: 'HANDSHAKE_ACK',
+  /** Emitted when all required players are present and room is ready for start. */
+  MATCH_READY: 'MATCH_READY',
+  /** Emitted when the multiplayer match officially starts. */
+  MATCH_STARTED: 'MATCH_STARTED',
+  /** Emitted when the multiplayer match finishes. */
+  MATCH_FINISHED: 'MATCH_FINISHED',
+  /** Emitted when the room is destroyed / closed. */
+  ROOM_DESTROYED: 'ROOM_DESTROYED',
 
   // ── SOCIAL_* (User-Facing Platform Actions) ────────────────────────────────
   INVITE_FRIEND: 'INVITE_FRIEND',
   SHARE_ROOM: 'SHARE_ROOM',
+
+  // ── LEGACY & DEPRECATED EVENTS ─────────────────────────────────────────────
+  /** @deprecated Kept for backwards compatibility. Room joining pipeline is managed by game/host. */
+  JOIN_PIPELINE_STARTED: 'JOIN_PIPELINE_STARTED',
+  /** @deprecated Kept for backwards compatibility. Room joining pipeline is managed by game/host. */
+  JOIN_PIPELINE_FINISHED: 'JOIN_PIPELINE_FINISHED',
+  /** @deprecated Kept for backwards compatibility. Handshakes are managed by game/host. */
+  HANDSHAKE_INIT: 'HANDSHAKE_INIT',
+  /** @deprecated Kept for backwards compatibility. Handshakes are managed by game/host. */
+  HANDSHAKE_ACK: 'HANDSHAKE_ACK',
+  /** @deprecated Replaced by ROOM_DESTROYED. */
+  DESTROYING_ROOM: 'DESTROYING_ROOM',
+  /** @deprecated Replaced by ROOM_DESTROYED. */
+  ROOM_CLOSED: 'ROOM_CLOSED',
+  /** @deprecated Command event. Prefer host.emit(SDKEvent.ROOM_JOINED). */
+  JOIN_ROOM: 'JOIN_ROOM',
+  /** @deprecated Replaced by PLAYER_LEFT or ROOM_DESTROYED. */
+  ROOM_LEFT: 'ROOM_LEFT',
+  /** @deprecated Replaced by MATCH_READY. */
+  MATCH_PREPARING: 'MATCH_PREPARING',
+  /** @deprecated Replaced by MATCH_STARTED. */
+  COUNTDOWN_STARTED: 'COUNTDOWN_STARTED',
+  /** @deprecated Managed at game implementation level. */
+  REMATCH_REQUESTED: 'REMATCH_REQUESTED',
+  /** @deprecated Managed at game implementation level. */
+  REMATCH_ACCEPTED: 'REMATCH_ACCEPTED',
+  /** @deprecated Managed at game implementation level. */
+  PLAYER_READY: 'PLAYER_READY',
+  /** @deprecated Managed at game implementation level. */
+  PLAYER_RECONNECTING: 'PLAYER_RECONNECTING',
+  /** @deprecated Managed at game implementation level. */
+  PLAYER_RECONNECTED: 'PLAYER_RECONNECTED',
+  /** @deprecated Managed at game implementation level. */
+  SCORE_UPDATED: 'SCORE_UPDATED',
+  /** @deprecated Managed at game implementation level. */
+  PLAYER_DIED: 'PLAYER_DIED',
 } as const;
 
 /**
@@ -212,13 +236,14 @@ export interface SDKDiagnostics {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Storage & Pipeline Architecture Types (v1.2)
+// Storage & Pipeline Architecture Types (Legacy / Deprecated)
+//
+// Room ownership belongs to the game implementation.
+// The SDK does not own, generate, or manage Room IDs, local tokens, or invites.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Storage abstraction interface for session recovery token persistence.
- * Platforms provide their own implementation (localStorage/IndexedDB in Web,
- * Secure Storage in Android, Keychain in iOS).
+ * @deprecated Legacy session storage adapter. Room and session persistence belong to game/host.
  */
 export interface ISessionStorageAdapter {
   getItem(key: string): Promise<string | null>;
@@ -228,7 +253,7 @@ export interface ISessionStorageAdapter {
 }
 
 /**
- * Standardized invite payload with canonical inviteId and schema versioning.
+ * @deprecated Legacy invite payload schema. Invitations and room creation are managed by WacharloApp/Game.
  */
 export interface InvitePayload {
   inviteSchemaVersion: '1.0';
@@ -247,7 +272,7 @@ export interface InvitePayload {
 }
 
 /**
- * Entry trigger channels that Wacharlo App forwards raw to the SDK.
+ * @deprecated Legacy trigger type. Entry triggers are forwarded by WacharloApp directly to the game.
  */
 export type JoinTriggerType =
   | 'deep_link'
@@ -259,7 +284,7 @@ export type JoinTriggerType =
   | 'matchmaking';
 
 /**
- * Raw trigger envelope delivered by Wacharlo App to GameSDK.
+ * @deprecated Legacy raw trigger event.
  */
 export interface RawAppTriggerEvent {
   trigger: JoinTriggerType;
@@ -274,7 +299,7 @@ export interface RawAppTriggerEvent {
 }
 
 /**
- * Normalized join request constructed and owned exclusively by GameSDK JoinPipelineManager.
+ * @deprecated Legacy join request. Room joining is owned by the game implementation.
  */
 export interface JoinRequest {
   requestId: string;
@@ -297,7 +322,7 @@ export interface JoinRequest {
 }
 
 /**
- * Strict room lifecycle states including DESTROYING teardown state.
+ * @deprecated Room lifecycle state. Room state management belongs to the game implementation.
  */
 export type RoomState =
   | 'IDLE'
@@ -310,7 +335,7 @@ export type RoomState =
   | 'CLOSED';
 
 /**
- * Handshake negotiation payload sent by guest upon room connection.
+ * @deprecated Handshake initialization payload.
  */
 export interface HandshakeInitPayload {
   sdkVersion: string;
@@ -320,7 +345,7 @@ export interface HandshakeInitPayload {
 }
 
 /**
- * Handshake response payload returned by room host/server.
+ * @deprecated Handshake ACK payload.
  */
 export interface HandshakeAckPayload {
   status: 'ACCEPTED' | 'REJECTED';

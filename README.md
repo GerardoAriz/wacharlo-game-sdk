@@ -1,11 +1,17 @@
 # @wacharlo/game-sdk
 
-> **Version**: `0.1.1-alpha` — API Freeze Phase  
-> **Status**: Public API frozen. Lifecycle contract defined. Ready for Phase 3 implementation.
+> **Version**: `2.0.0-rc.1` — Game-Agnostic Communication Bridge  
+> **Status**: Release Candidate. Game-agnostic multiplayer communication bridge.
 
 The official integration layer between all Wacharlo HTML5 games and the **Wacharlo Flutter Game Hub**.
 
 Every game uses one SDK. One SDK talks to one host. Clean boundary.
+
+> [!IMPORTANT]
+> **Game-Agnostic SDK & Room Ownership Rule**
+> - **Game-Agnostic**: The SDK is completely game-agnostic and contains no game-specific logic or imports. It works out-of-the-box for any current or future game (e.g. Rope Rush, Tiny Keeper, Rocket Lander, Swing Hero, Flappy Chícharo).
+> - **Room Ownership**: *Room ownership belongs to the game implementation. The SDK does not own, generate, or manage Room IDs.*
+> - **Pure Communication Bridge**: The SDK only forwards standardized events and envelopes bi-directionally between the Game and WacharloApp.
 
 ---
 

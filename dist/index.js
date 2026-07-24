@@ -53,8 +53,12 @@
 // ── PRIMARY PUBLIC API ────────────────────────────────────────────────────────
 /** The main SDK class. The only class game code should ever instantiate. */
 export { GameSDK } from './sdk/GameSDK';
+/** Constant map of all SDK events organized into logical namespaces. */
+export { SDKEvent } from './types/index';
+export { HostManager } from './host/HostManager';
+export { SocialManager } from './social/SocialManager';
 // ── VERSION ───────────────────────────────────────────────────────────────────
-/** The running SDK version string. E.g. "0.1.0-alpha". */
+/** The running SDK version string. E.g. "1.1.0-rc1". */
 export { SDK_VERSION } from './version/index';
 // ── ADVANCED / EXTENSION SURFACE ─────────────────────────────────────────────
 // The items below are exported for advanced use cases:
@@ -65,4 +69,11 @@ export { SDK_VERSION } from './version/index';
 /** Structured logger with configurable log levels. */
 export { Logger, LogLevel } from './logger/Logger';
 export { BridgeAdapter } from './bridge/BridgeAdapter';
+// ── LEGACY & DEPRECATED SERVICES (Kept for runtime backwards compatibility) ──
+// Room ownership belongs to the game implementation.
+// The SDK does not own, generate, or manage Room IDs or invitation pipelines.
+export { MemoryStorageAdapter, LocalStorageAdapter } from './session/StorageAdapter.js';
+export { InvitationService, InMemoryLookupService } from './social/InvitationService.js';
+export { JoinPipelineManager } from './session/JoinPipelineManager.js';
+export { SessionRecoveryManager } from './session/SessionRecoveryManager.js';
 //# sourceMappingURL=index.js.map

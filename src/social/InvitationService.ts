@@ -28,7 +28,10 @@ export class InMemoryLookupService implements ILookupService {
 /**
  * InvitationService
  *
- * Handles creation, signing, validation, and resolution of InvitePayloads.
+ * @deprecated
+ * Room ownership belongs to the game implementation.
+ * The SDK does not own, generate, or manage Room IDs, invitation links, or code resolution.
+ * This class is retained for backwards compatibility only.
  */
 export class InvitationService {
   private readonly logger = new Logger('InvitationService');

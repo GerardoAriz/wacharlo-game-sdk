@@ -2,6 +2,8 @@ import type { IGameSDK, GameResult } from './IGameSDK';
 import type { GameConfig } from '../config/GameConfig';
 import type { SDKGameData, SDKEventType, SDKDiagnostics } from '../types/index';
 import type { EventCallback } from '../events/IEventManager';
+import type { IHostManager } from '../host/IHostManager';
+import type { ISocialManager } from '../social/ISocialManager';
 import { Transport } from '../transport/Transport';
 /**
  * GameSDK
@@ -13,6 +15,8 @@ export declare class GameSDK implements IGameSDK {
     private readonly _data;
     private readonly _events;
     private readonly _achievements;
+    private readonly _hostManager;
+    private readonly _socialManager;
     private readonly _logger;
     private readonly _transport;
     private _initialized;
@@ -33,6 +37,8 @@ export declare class GameSDK implements IGameSDK {
     private _pendingReportData;
     get version(): string;
     get config(): Readonly<GameConfig>;
+    get host(): IHostManager;
+    get social(): ISocialManager;
     private constructor();
     static create(config: GameConfig, overrides?: {
         transport?: Transport;
@@ -54,6 +60,7 @@ export declare class GameSDK implements IGameSDK {
     off<T = unknown>(event: SDKEventType, callback: EventCallback<T>): void;
     dispose(): void;
     getDiagnostics(): SDKDiagnostics;
+    private sendHostEnvelope;
     private createMessageEnvelope;
 }
 //# sourceMappingURL=GameSDK.d.ts.map

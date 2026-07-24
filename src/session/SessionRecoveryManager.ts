@@ -12,6 +12,12 @@ export interface RecoverySessionData {
   payload?: Record<string, unknown>;
 }
 
+/**
+ * @deprecated
+ * Room ownership belongs to the game implementation.
+ * The SDK does not own, generate, or persist Room IDs or recovery tokens.
+ * This class is retained for backwards compatibility only.
+ */
 export class SessionRecoveryManager {
   private readonly logger = new Logger('SessionRecoveryManager');
   private static readonly STORAGE_KEY = '__wacha_session_recovery_token__';

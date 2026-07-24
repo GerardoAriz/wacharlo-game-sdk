@@ -124,7 +124,9 @@ export type {
   HandshakeAckPayload,
 } from './types/index';
 
-// ── V1.2 ARCHITECTURE SERVICES & ADAPTERS ────────────────────────────────────
+// ── LEGACY & DEPRECATED SERVICES (Kept for runtime backwards compatibility) ──
+// Room ownership belongs to the game implementation.
+// The SDK does not own, generate, or manage Room IDs or invitation pipelines.
 
 export { MemoryStorageAdapter, LocalStorageAdapter } from './session/StorageAdapter.js';
 export { InvitationService, InMemoryLookupService } from './social/InvitationService.js';

@@ -2,6 +2,8 @@ import { SessionManager } from '../session/SessionManager';
 import { GameDataManager } from '../state/GameDataManager';
 import { EventManager } from '../events/EventManager';
 import { AchievementManager } from '../achievements/AchievementManager';
+import { HostManager } from '../host/HostManager';
+import { SocialManager } from '../social/SocialManager';
 import { Logger } from '../logger/Logger';
 import { SDK_VERSION } from '../version/index';
 import { detectTransport } from '../transport/detect';
@@ -16,6 +18,8 @@ export class GameSDK {
     _data;
     _events;
     _achievements;
+    _hostManager;
+    _socialManager;
     _logger;
     _transport;
     _initialized = false;
@@ -42,6 +46,12 @@ export class GameSDK {
     get config() {
         return this._config;
     }
+    get host() {
+        return this._hostManager;
+    }
+    get social() {
+        return this._socialManager;
+    }
     // ── Constructor (Private — use GameSDK.create()) ───────────────────────────
     constructor(config, overrides) {
         this._config = Object.freeze({ ...config });
@@ -51,6 +61,8 @@ export class GameSDK {
         this._events = new EventManager();
         this._achievements = new AchievementManager(this._events);
         this._transport = overrides?.transport ?? detectTransport();
+        this._hostManager = new HostManager(this._events, (envelope) => this.sendHostEnvelope(envelope), () => this._session.getId() ?? undefined);
+        this._socialManager = new SocialManager(this._hostManager);
         if (overrides?.sessionId && overrides.sessionId.trim() !== '') {
             this._hostSessionId = overrides.sessionId.trim();
             this._hostSessionOrigin = 'manual';
@@ -312,7 +324,11 @@ export class GameSDK {
         };
     }
     // ── Private Envelope Builder ───────────────────────────────────────────────
-    createMessageEnvelope(event, payload) {
+    sendHostEnvelope(envelope) {
+        const msg = this.createMessageEnvelope(envelope.event, envelope.payload, envelope.roomId);
+        this._transport.send(msg);
+    }
+    createMessageEnvelope(event, payload, roomId) {
         const meta = this._session.getMeta();
         const sessionId = meta?.sessionId ?? '';
         const device = meta?.device ?? {
@@ -331,6 +347,7 @@ export class GameSDK {
             sessionId,
             device,
             data: this._data.getLastSnapshot() ?? {},
+            ...(roomId ? { roomId } : {}),
             payload,
         };
     }

@@ -8,7 +8,31 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
-> Changes that are planned or in progress but not yet released.
+## [2.0.0-rc.1] - 2026-07-24
+
+### Changed (Breaking Changes & Deprecations)
+- **Game-Agnostic SDK Architecture**:
+  - Enforced strict game-agnostic design. The SDK contains no game-specific classes, enums, or imports.
+  - Reusable without modification across all current and future games (e.g. Rope Rush, Tiny Keeper, Rocket Lander, Swing Hero, Flappy Chícharo).
+- **Room Ownership Rule**:
+  - *"Room ownership belongs to the game implementation. The SDK does not own, generate, or manage Room IDs."*
+- **Standardized Multiplayer Event Flow**:
+  - Standardized the core multiplayer event lifecycle contract:
+    - `ROOM_CREATED`
+    - `ROOM_JOINED`
+    - `PLAYER_JOINED`
+    - `PLAYER_LEFT`
+    - `MATCH_READY`
+    - `MATCH_STARTED`
+    - `MATCH_FINISHED`
+    - `ROOM_DESTROYED`
+- **Safe Deprecation (Zero Code Deletion)**:
+  - Marked legacy joining pipeline modules (`JoinPipelineManager`, `InvitationService`, `SessionRecoveryManager`, `StorageAdapter`) and legacy events (`JOIN_PIPELINE_*`, `HANDSHAKE_*`, `DESTROYING_ROOM`, `ROOM_CLOSED`) as `@deprecated` with JSDoc notices.
+  - Retained internal implementations to guarantee 100% runtime stability while end-to-end user testing takes place.
+
+### Added
+- **Bi-directional Integration Contract Test (`tests/api-contract/bridgeContract.test.ts`)**:
+  - Added full integration test suite certifying the complete `Game <-> SDK <-> Host (WacharloApp)` communication path for all standardized multiplayer lifecycle events and envelope integrity.
 
 ## [1.1.0-rc1] - 2026-07-22
 

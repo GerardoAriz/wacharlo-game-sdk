@@ -1,7 +1,8 @@
 import { ISessionStorageAdapter } from '../types/index.js';
 
 /**
- * In-memory fallback storage adapter for environments without persistent storage.
+ * @deprecated Legacy in-memory fallback storage adapter.
+ * Room ownership belongs to the game implementation.
  */
 export class MemoryStorageAdapter implements ISessionStorageAdapter {
   private storage = new Map<string, string>();
@@ -24,8 +25,8 @@ export class MemoryStorageAdapter implements ISessionStorageAdapter {
 }
 
 /**
- * Web localStorage adapter for browser environments.
- * Gracefully falls back to MemoryStorageAdapter if window.localStorage is unavailable or throws.
+ * @deprecated Web localStorage adapter for browser environments.
+ * Room ownership belongs to the game implementation.
  */
 export class LocalStorageAdapter implements ISessionStorageAdapter {
   private fallback = new MemoryStorageAdapter();

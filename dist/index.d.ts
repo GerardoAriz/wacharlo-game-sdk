@@ -58,11 +58,17 @@ export type { GameConfig } from './config/GameConfig';
 export type { GameResult } from './sdk/IGameSDK';
 /** Game data fields the SDK can communicate. All are optional in sdk.report(). */
 export type { SDKGameData } from './types/index';
-/** All event names the SDK emits or receives. Used in sdk.on() / sdk.off(). */
-export type { SDKEventType } from './types/index';
-/** The callback signature for sdk.on() listeners. */
+/** Constant map of all SDK events organized into logical namespaces. */
+export { SDKEvent } from './types/index';
+/** All event names the SDK emits or receives. */
+export type { SDKEventType, SDKEventEnvelope } from './types/index';
+/** The callback signature for event listeners. */
 export type { EventCallback } from './events/IEventManager';
-/** The running SDK version string. E.g. "0.1.0-alpha". */
+export type { IHostManager } from './host/IHostManager';
+export { HostManager } from './host/HostManager';
+export type { ISocialManager } from './social/ISocialManager';
+export { SocialManager } from './social/SocialManager';
+/** The running SDK version string. E.g. "1.1.0-rc1". */
 export { SDK_VERSION } from './version/index';
 /** Structured logger with configurable log levels. */
 export { Logger, LogLevel } from './logger/Logger';
@@ -71,5 +77,12 @@ export type { IBridgeAdapter } from './bridge/IBridgeAdapter';
 export { BridgeAdapter } from './bridge/BridgeAdapter';
 /** Full SDK interface — useful for typing sdk instances in tests. */
 export type { IGameSDK } from './sdk/IGameSDK';
-export type { SDKEventPayload, SDKMessageType, SDKDeviceInfo, SDKSessionMeta, SDKDiagnostics, } from './types/index';
+export type { SDKEventPayload, SDKMessageType, SDKDeviceInfo, SDKSessionMeta, SDKDiagnostics, ISessionStorageAdapter, InvitePayload, JoinTriggerType, RawAppTriggerEvent, JoinRequest, RoomState, HandshakeInitPayload, HandshakeAckPayload, } from './types/index';
+export { MemoryStorageAdapter, LocalStorageAdapter } from './session/StorageAdapter.js';
+export { InvitationService, InMemoryLookupService } from './social/InvitationService.js';
+export type { ILookupService } from './social/InvitationService.js';
+export { JoinPipelineManager } from './session/JoinPipelineManager.js';
+export type { JoinPipelineResult } from './session/JoinPipelineManager.js';
+export { SessionRecoveryManager } from './session/SessionRecoveryManager.js';
+export type { RecoverySessionData } from './session/SessionRecoveryManager.js';
 //# sourceMappingURL=index.d.ts.map
