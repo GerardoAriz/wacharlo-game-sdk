@@ -47,6 +47,8 @@ export const SDKEvent = {
   MATCH_READY: 'MATCH_READY',
   /** Emitted when the multiplayer match officially starts. */
   MATCH_STARTED: 'MATCH_STARTED',
+  /** Emitted when a player dies or is eliminated from a match. */
+  PLAYER_DIED: 'PLAYER_DIED',
   /** Emitted when the multiplayer match finishes. */
   MATCH_FINISHED: 'MATCH_FINISHED',
   /** Emitted when the room is destroyed / closed. */
@@ -89,8 +91,6 @@ export const SDKEvent = {
   PLAYER_RECONNECTED: 'PLAYER_RECONNECTED',
   /** @deprecated Managed at game implementation level. */
   SCORE_UPDATED: 'SCORE_UPDATED',
-  /** @deprecated Managed at game implementation level. */
-  PLAYER_DIED: 'PLAYER_DIED',
 } as const;
 
 /**
@@ -353,6 +353,85 @@ export interface HandshakeAckPayload {
   errorCode?: string;
   reason?: string;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Authoritative Multiplayer Match & Evaluation Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface PlayerState {
+  playerId: string;
+  isAlive: boolean;
+  score: number;
+  deathOrder?: number;
+  diedAt?: number;
+  teamId?: string;
+  customStats?: Record<string, unknown>;
+}
+
+export interface MatchStateSnapshot {
+  roomId: string;
+  players: ReadonlyArray<Readonly<PlayerState>>;
+  aliveCount: number;
+  eliminatedCount: number;
+  eliminationOrder: ReadonlyArray<string>;
+  finalScores: Readonly<Record<string, number>>;
+  startTime: number;
+  durationMs: number;
+}
+
+export interface PlayerPlacement {
+  playerId: string;
+  rank: number;
+  score: number;
+  isSurvivor: boolean;
+  eliminatedAt?: number;
+  teamId?: string;
+}
+
+export interface MatchEvaluationResult {
+  winners: string[];
+  placements: PlayerPlacement[];
+  ruleName: string;
+  reason: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface PlayerDiedPayload {
+  playerId: string;
+  roomId?: string;
+  score?: number;
+  reason?: string;
+  timestamp?: number;
+}
+
+export interface MatchFinishedPayload {
+  roomId: string;
+  winners: string[];
+  placements: PlayerPlacement[];
+  finalScores: Record<string, number>;
+  eliminationOrder: string[];
+  matchDurationMs: number;
+  ruleName: string;
+  reason: string;
+  completedAt: number;
+}
+
+export interface IMatchRuleEvaluator {
+  readonly name: string;
+  isMatchComplete(snapshot: Readonly<MatchStateSnapshot>): boolean;
+  evaluateResult(snapshot: Readonly<MatchStateSnapshot>): MatchEvaluationResult;
+}
+
+export interface IMatchDataAggregator {
+  getRoomId(): string;
+  startMatch(playerIds: string[], startTime?: number): void;
+  processPlayerDied(playerId: string, score?: number, timestamp?: number): boolean;
+  updatePlayerScore(playerId: string, score: number): void;
+  getSnapshot(): Readonly<MatchStateSnapshot>;
+  isPlayerAlive(playerId: string): boolean;
+  getPlayerState(playerId: string): Readonly<PlayerState> | undefined;
+}
+
 
 
 

@@ -66,6 +66,12 @@ export type { SDKEventType, SDKEventEnvelope } from './types/index';
 export type { EventCallback } from './events/IEventManager';
 export type { IHostManager } from './host/IHostManager';
 export { HostManager } from './host/HostManager';
+export { HostMatchController } from './host/HostMatchController';
+export type { HostMatchControllerOptions } from './host/HostMatchController';
+export { MatchDataAggregator } from './host/MatchDataAggregator';
+export { LastAliveRuleEvaluator } from './host/evaluators/LastAliveRuleEvaluator';
+export { HighestScoreRuleEvaluator } from './host/evaluators/HighestScoreRuleEvaluator';
+export type { HighestScoreRuleOptions } from './host/evaluators/HighestScoreRuleEvaluator';
 export type { ISocialManager } from './social/ISocialManager';
 export { SocialManager } from './social/SocialManager';
 /** The running SDK version string. E.g. "1.1.0-rc1". */
@@ -77,7 +83,7 @@ export type { IBridgeAdapter } from './bridge/IBridgeAdapter';
 export { BridgeAdapter } from './bridge/BridgeAdapter';
 /** Full SDK interface — useful for typing sdk instances in tests. */
 export type { IGameSDK } from './sdk/IGameSDK';
-export type { SDKEventPayload, SDKMessageType, SDKDeviceInfo, SDKSessionMeta, SDKDiagnostics, ISessionStorageAdapter, InvitePayload, JoinTriggerType, RawAppTriggerEvent, JoinRequest, RoomState, HandshakeInitPayload, HandshakeAckPayload, } from './types/index';
+export type { SDKEventPayload, SDKMessageType, SDKDeviceInfo, SDKSessionMeta, SDKDiagnostics, ISessionStorageAdapter, InvitePayload, JoinTriggerType, RawAppTriggerEvent, JoinRequest, RoomState, HandshakeInitPayload, HandshakeAckPayload, PlayerState, MatchStateSnapshot, PlayerPlacement, MatchEvaluationResult, PlayerDiedPayload, MatchFinishedPayload, IMatchRuleEvaluator, IMatchDataAggregator, } from './types/index';
 export { MemoryStorageAdapter, LocalStorageAdapter } from './session/StorageAdapter.js';
 export { InvitationService, InMemoryLookupService } from './social/InvitationService.js';
 export type { ILookupService } from './social/InvitationService.js';

@@ -56,6 +56,10 @@ export { GameSDK } from './sdk/GameSDK';
 /** Constant map of all SDK events organized into logical namespaces. */
 export { SDKEvent } from './types/index';
 export { HostManager } from './host/HostManager';
+export { HostMatchController } from './host/HostMatchController';
+export { MatchDataAggregator } from './host/MatchDataAggregator';
+export { LastAliveRuleEvaluator } from './host/evaluators/LastAliveRuleEvaluator';
+export { HighestScoreRuleEvaluator } from './host/evaluators/HighestScoreRuleEvaluator';
 export { SocialManager } from './social/SocialManager';
 // ── VERSION ───────────────────────────────────────────────────────────────────
 /** The running SDK version string. E.g. "1.1.0-rc1". */

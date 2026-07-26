@@ -80,6 +80,12 @@ export type { EventCallback } from './events/IEventManager';
 
 export type { IHostManager } from './host/IHostManager';
 export { HostManager } from './host/HostManager';
+export { HostMatchController } from './host/HostMatchController';
+export type { HostMatchControllerOptions } from './host/HostMatchController';
+export { MatchDataAggregator } from './host/MatchDataAggregator';
+export { LastAliveRuleEvaluator } from './host/evaluators/LastAliveRuleEvaluator';
+export { HighestScoreRuleEvaluator } from './host/evaluators/HighestScoreRuleEvaluator';
+export type { HighestScoreRuleOptions } from './host/evaluators/HighestScoreRuleEvaluator';
 
 export type { ISocialManager } from './social/ISocialManager';
 export { SocialManager } from './social/SocialManager';
@@ -122,6 +128,14 @@ export type {
   RoomState,
   HandshakeInitPayload,
   HandshakeAckPayload,
+  PlayerState,
+  MatchStateSnapshot,
+  PlayerPlacement,
+  MatchEvaluationResult,
+  PlayerDiedPayload,
+  MatchFinishedPayload,
+  IMatchRuleEvaluator,
+  IMatchDataAggregator,
 } from './types/index';
 
 // ── LEGACY & DEPRECATED SERVICES (Kept for runtime backwards compatibility) ──

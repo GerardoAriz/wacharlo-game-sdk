@@ -44,6 +44,8 @@ export const SDKEvent = {
     MATCH_READY: 'MATCH_READY',
     /** Emitted when the multiplayer match officially starts. */
     MATCH_STARTED: 'MATCH_STARTED',
+    /** Emitted when a player dies or is eliminated from a match. */
+    PLAYER_DIED: 'PLAYER_DIED',
     /** Emitted when the multiplayer match finishes. */
     MATCH_FINISHED: 'MATCH_FINISHED',
     /** Emitted when the room is destroyed / closed. */
@@ -84,7 +86,5 @@ export const SDKEvent = {
     PLAYER_RECONNECTED: 'PLAYER_RECONNECTED',
     /** @deprecated Managed at game implementation level. */
     SCORE_UPDATED: 'SCORE_UPDATED',
-    /** @deprecated Managed at game implementation level. */
-    PLAYER_DIED: 'PLAYER_DIED',
 };
 //# sourceMappingURL=index.js.map
